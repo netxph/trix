@@ -1,4 +1,4 @@
-# Dart Tracker
+# trix
 
 A mobile-first darts scoring PWA for tracking a single player's game, dart by dart. It runs locally, works offline after installation, and stores the current game in the browser—no account or backend required.
 

@@ -26,7 +26,7 @@ async function files(directory: string): Promise<string[]> {
 }
 
 const assets = (await files('dist')).map((path) => `./${relative('dist', path).replaceAll('\\', '/')}`)
-const cache = `dart-tracker-${Date.now()}`
+const cache = `trix-${Date.now()}`
 await writeFile('dist/sw.js', `const CACHE=${JSON.stringify(cache)};const ROOT=new URL('./',self.location.href);const FALLBACK=new URL('index.html',ROOT).href;const ASSETS=${JSON.stringify(assets)}.map(path=>new URL(path,ROOT).href);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

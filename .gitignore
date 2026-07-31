@@ -1,0 +1,46 @@
+# Bun / TypeScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.local
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+bun-debug.log*
+
+# AI tools
+.ai/
+.aider/
+.augment/
+.claude/
+.cline/
+.codex/
+.continue/
+.copilot/
+.cursor/
+.gemini/
+.pi/
+.qodo/
+.roo/
+.tabnine/
+.windsurf/
+graphify-out/
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

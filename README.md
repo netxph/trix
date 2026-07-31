@@ -43,7 +43,7 @@ Open <http://localhost:3000>.
 bun run build
 ```
 
-Deploy the contents of `dist/` at the root of an HTTPS origin. The build generates a service worker that caches the application shell for offline use.
+Deploy the contents of `dist/` to any path on an HTTPS origin, including a GitHub Pages project path such as `/trix/`. The build generates a path-relative service worker that caches the application shell for offline use.
 
 ## Gameplay rules
 

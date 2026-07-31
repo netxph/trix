@@ -9,6 +9,8 @@ Bun.serve({
     '/manifest.webmanifest': asset('manifest.webmanifest', 'application/manifest+json'),
     '/pwa-192.png': asset('pwa-192.png', 'image/png'),
     '/pwa-512.png': asset('pwa-512.png', 'image/png'),
+    '/pwa-maskable-192.png': asset('pwa-maskable-192.png', 'image/png'),
+    '/pwa-maskable-512.png': asset('pwa-maskable-512.png', 'image/png'),
   },
   development: { hmr: true, console: true },
 })

@@ -6,12 +6,13 @@ A mobile-first darts scoring PWA for tracking a run of standard games, dart by d
 
 - Configurable starting score and round limit
 - Three-dart draft with a live projected score
+- Automatic movement to the next dart after each selection, wrapping after Dart 3
 - Singles, doubles, triples, bull, bullseye, and misses
 - Standard double-out checkout and bust rules
 - Scrollable round history and run-level end-game statistics
-- Wins, losses, and winning percentage across the run
+- Wins/losses shown as a compact record, plus winning percentage across the run
 - Current-run persistence with IndexedDB
-- Installable, offline-capable PWA
+- Installable, offline-capable PWA with in-app updates
 - Next game with the same configuration or a new run
 
 ## Requirements
@@ -48,9 +49,11 @@ Deploy the contents of `dist/` to any path on an HTTPS origin, including a GitHu
 
 ## Gameplay rules
 
-Each round contains three editable dart slots, initially set to `Miss`. Submitting applies scoring sequentially. A checkout must finish on a double, including double bull. A bust restores the score from the start of the round and records zero points for that round.
+Each round contains three editable dart slots, initially set to `Miss`. Submitting applies scoring sequentially. A checkout must finish on a double, including double bull. A bust restores the score from the start of the round and records zero points for that round. Each dart starts as `Miss`; selecting a dart automatically advances the active slot, and selecting a slot manually still works.
 
-Setup creates a run with a starting score and round limit. `Next game` keeps that configuration and preserves the run's aggregate statistics. During an active game, `End game` finishes it as a loss and opens the summary. `New run` clears the current run and returns to setup.
+Setup creates a run with a starting score and round limit. `Next game` keeps that configuration and preserves the run's aggregate statistics. During an active game, `End game` opens an in-app confirmation and, once confirmed, finishes the game as a loss and opens the summary. `New run` clears the current run and returns to setup.
+
+When a new application version is available, the summary screen shows an `App update` button. Selecting it activates the update and reloads the app.
 
 ## Technology
 

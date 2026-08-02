@@ -49,17 +49,49 @@ function Play({ run, onChange, onEnd }: { run: Run; onChange: (run: Run) => void
   </main>
 }
 
-function Result({ run, onNext, onNew }: { run: Run; onNext: () => void; onNew: () => void }) {
+function Result({ run, onNext, onNew, onUpdate }: { run: Run; onNext: () => void; onNew: () => void; onUpdate: (() => void) | null }) {
   const game = run.currentGame; const stats = useMemo(() => runStatistics(run), [run]); const won = game.status === 'checkout'
   return <main className="mx-auto flex h-dvh max-w-md flex-col overflow-y-auto px-4 py-4">
     <div className={`shrink-0 rounded-3xl p-5 text-white ${won ? 'bg-emerald-600' : 'bg-slate-900'}`}><p className="text-sm font-bold uppercase tracking-widest text-white/70">Game complete</p><h1 className="mt-1 text-4xl font-black">{won ? 'Congratulations!' : 'Sorry, not this time.'}</h1><p className="mt-1 text-white/80">{won ? 'You checked out!' : game.status === 'ended' ? 'You ended the game.' : `You finished with ${game.remaining} remaining.`}</p></div>
     <section className="mt-4 shrink-0"><h2 className="mb-2 text-xl font-black">Your statistics</h2><div className="grid grid-cols-2 gap-2">{[['Round average', stats.average.toFixed(1)], ['Best round', stats.bestRound], ['Darts thrown', stats.totalDarts], ['Highest dart', stats.highestDart], ['Checkout', `${stats.checkoutPercentage.toFixed(0)}%`], ['Attempts', stats.checkoutAttempts], ['Wins', `${stats.wins}/${stats.wins + stats.losses}`], ['Winning percentage', `${stats.winningPercentage.toFixed(0)}%`]].map(([label, value]) => <div className="rounded-xl bg-white p-3 shadow-sm" key={label as string}><p className="text-sm text-slate-500">{label}</p><b className="text-xl">{value}</b></div>)}</div><div className="mt-2 rounded-xl bg-white p-3 shadow-sm"><p className="mb-1 font-bold">Shot breakdown</p><p className="text-sm text-slate-600">Singles {stats.singles} · Doubles {stats.doubles} · Triples {stats.triples}</p><p className="text-sm text-slate-600">Bulls {stats.bulls} · Misses {stats.misses}</p></div></section>
     <section className="mt-3 flex min-h-24 flex-1 flex-col overflow-hidden rounded-2xl bg-slate-200/60 p-2"><h2 className="mb-1 px-1 text-lg font-black">Round scores</h2><div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain pr-1">{game.rounds.map(round => <div className="flex justify-between rounded-lg bg-white px-3 py-2 shadow-sm" key={round.number}><span>Round {round.number}</span><b>{round.busted ? 'Bust · 0' : round.scored}</b></div>)}</div></section>
     <div className="mt-3 grid grid-cols-2 gap-2"><button className="rounded-xl bg-sky-500 px-4 py-4 font-black text-slate-950" onClick={onNext}>Next game</button><button className="rounded-xl bg-slate-900 px-4 py-4 font-black text-white" onClick={onNew}>New run</button></div>
+    {onUpdate && <button className="mt-2 w-full rounded-xl border-2 border-sky-200 bg-sky-50 px-4 py-3 font-black text-sky-700" onClick={onUpdate}>App update</button>}
   </main>
 }
 
+function useAppUpdate() {
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
+  const [available, setAvailable] = useState(false)
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+    let disposed = false
+    const watch = (reg: ServiceWorkerRegistration) => {
+      if (reg.waiting) { setRegistration(reg); setAvailable(true); return }
+      const worker = reg.installing
+      if (!worker) return
+      worker.addEventListener('statechange', () => {
+        if (!disposed && worker.state === 'installed' && navigator.serviceWorker.controller) { setRegistration(reg); setAvailable(true) }
+      })
+    }
+    let current: ServiceWorkerRegistration | undefined
+    const onUpdateFound = () => { if (current) watch(current) }
+    navigator.serviceWorker.ready.then(reg => {
+      if (disposed) return
+      current = reg; watch(reg); reg.addEventListener('updatefound', onUpdateFound); void reg.update()
+    })
+    return () => { disposed = true; current?.removeEventListener('updatefound', onUpdateFound) }
+  }, [])
+  if (!available || !registration?.waiting) return null
+  const waiting = registration.waiting
+  return () => {
+    navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload(), { once: true })
+    waiting.postMessage({ type: 'SKIP_WAITING' })
+  }
+}
+
 export default function App() {
+  const appUpdate = useAppUpdate()
   const [run, setRun] = useState<Run | null>(null)
   useEffect(() => {
     let mounted = true
@@ -70,6 +102,6 @@ export default function App() {
   useEffect(() => { if (run) void saveRun(run).catch(() => undefined) }, [run])
   const resetRun = async () => { await clearRun(); setRun(null) }
   if (!run) return <Setup onStart={(score, rounds) => setRun(newRun(score, rounds))} />
-  if (run.currentGame.status !== 'active') return <Result run={run} onNext={() => setRun(nextGame(run))} onNew={resetRun} />
+  if (run.currentGame.status !== 'active') return <Result run={run} onNext={() => setRun(nextGame(run))} onNew={resetRun} onUpdate={appUpdate} />
   return <Play run={run} onChange={setRun} onEnd={() => setRun({ ...run, currentGame: endGame(run.currentGame) })} />
 }

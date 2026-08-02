@@ -2,7 +2,8 @@ import app from './index.html'
 
 const asset = (name: string, type: string) => () => new Response(Bun.file(`public/${name}`), { headers: { 'Content-Type': type } })
 
-Bun.serve({
+const server = Bun.serve({
+  port: Number(process.env.PORT) || 3000,
   routes: {
     '/': app,
     '/sw.js': asset('sw.js', 'text/javascript'),
@@ -14,3 +15,5 @@ Bun.serve({
   },
   development: { hmr: true, console: true },
 })
+
+console.log(`trix dev server running at ${server.url}`)

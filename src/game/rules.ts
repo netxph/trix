@@ -1,4 +1,4 @@
-import type { Dart, Game, Round } from './types'
+import type { Dart, Game, Round, Run } from './types'
 import { miss } from './types'
 
 export const isDouble = (dart: Dart) => dart.kind === 'number' ? dart.multiplier === 2 : dart.kind === 'bull' && dart.score === 50
@@ -25,6 +25,12 @@ export function submitRound(game: Game, darts: Dart[]): { game: Game; round: Rou
 
 export const newGame = (startingScore: number, roundLimit: number): Game => ({ id: 'current', startingScore, roundLimit, remaining: startingScore, rounds: [], status: 'active' })
 
+export const newRun = (startingScore: number, roundLimit: number): Run => ({ id: 'current', startingScore, roundLimit, currentGame: newGame(startingScore, roundLimit), completedGames: [] })
+
+export const endGame = (game: Game): Game => ({ ...game, status: 'ended' })
+
+export const nextGame = (run: Run): Run => ({ ...run, currentGame: newGame(run.startingScore, run.roundLimit), completedGames: [...run.completedGames, run.currentGame] })
+
 export function statistics(game: Game) {
   const darts = game.rounds.flatMap((round) => round.darts)
   const scoredRounds = game.rounds.map((round) => round.scored)
@@ -49,5 +55,35 @@ export function statistics(game: Game) {
     checkoutAttempts: attempts.length,
     checkouts: successes,
     checkoutPercentage: attempts.length ? (successes / attempts.length) * 100 : 0,
+    wins: game.status === 'checkout' ? 1 : 0,
+    losses: game.status === 'limit' || game.status === 'ended' ? 1 : 0,
+  }
+}
+
+export function runStatistics(run: Run) {
+  const games = [...run.completedGames, ...(run.currentGame.status === 'active' ? [] : [run.currentGame])]
+  const perGame = games.map(statistics)
+  const rounds = perGame.flatMap((item) => item.perRound)
+  const totalDarts = perGame.reduce((sum, item) => sum + item.totalDarts, 0)
+  const checkoutAttempts = perGame.reduce((sum, item) => sum + item.checkoutAttempts, 0)
+  const wins = perGame.reduce((sum, item) => sum + item.wins, 0)
+  const losses = perGame.reduce((sum, item) => sum + item.losses, 0)
+  return {
+    totalDarts,
+    average: rounds.length ? rounds.reduce((sum, score) => sum + score, 0) / rounds.length : 0,
+    perRound: rounds,
+    bestRound: Math.max(0, ...rounds),
+    singles: perGame.reduce((sum, item) => sum + item.singles, 0),
+    doubles: perGame.reduce((sum, item) => sum + item.doubles, 0),
+    triples: perGame.reduce((sum, item) => sum + item.triples, 0),
+    bulls: perGame.reduce((sum, item) => sum + item.bulls, 0),
+    misses: perGame.reduce((sum, item) => sum + item.misses, 0),
+    highestDart: Math.max(0, ...perGame.map((item) => item.highestDart)),
+    checkoutAttempts,
+    checkouts: perGame.reduce((sum, item) => sum + item.checkouts, 0),
+    checkoutPercentage: checkoutAttempts ? perGame.reduce((sum, item) => sum + item.checkouts, 0) / checkoutAttempts * 100 : 0,
+    wins,
+    losses,
+    winningPercentage: wins + losses ? wins / (wins + losses) * 100 : 0,
   }
 }

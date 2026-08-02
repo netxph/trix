@@ -1,10 +1,11 @@
 export type Multiplier = 1 | 2 | 3
 export type DartKind = 'number' | 'bull' | 'miss'
-export type GameStatus = 'active' | 'checkout' | 'limit'
+export type GameStatus = 'active' | 'checkout' | 'limit' | 'ended'
 
 export type Dart = { kind: DartKind; value: number; multiplier: Multiplier; score: number }
 export type Round = { number: number; darts: Dart[]; scored: number; remainingBefore: number; remainingAfter: number; busted: boolean; checkout: boolean }
 export type Game = { id: 'current'; startingScore: number; roundLimit: number; remaining: number; rounds: Round[]; status: GameStatus }
+export type Run = { id: 'current'; startingScore: number; roundLimit: number; currentGame: Game; completedGames: Game[] }
 
 export const miss = (): Dart => ({ kind: 'miss', value: 0, multiplier: 1, score: 0 })
 export const numberDart = (value: number, multiplier: Multiplier): Dart => ({ kind: 'number', value, multiplier, score: value * multiplier })

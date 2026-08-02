@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'bun:test'
-import { clearGame, loadGame, saveGame } from './store'
-import { newGame } from '../game/rules'
+import { clearRun, loadRun, saveRun } from './store'
+import { newRun } from '../game/rules'
 
-describe('current game storage', () => {
-  it('replaces the current game and clears it for a new game', async () => {
-    await saveGame(newGame(501, 10))
-    await saveGame(newGame(301, 8))
-    expect((await loadGame())?.startingScore).toBe(301)
-    await clearGame()
-    expect(await loadGame()).toBeUndefined()
+describe('run storage', () => {
+  it('replaces the current run and clears it for a new run', async () => {
+    await saveRun(newRun(501, 10))
+    await saveRun(newRun(301, 8))
+    expect((await loadRun())?.startingScore).toBe(301)
+    expect((await loadRun())?.roundLimit).toBe(8)
+    await clearRun()
+    expect(await loadRun()).toBeUndefined()
   })
 })

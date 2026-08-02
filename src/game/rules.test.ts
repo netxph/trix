@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { bullDart, miss, numberDart } from './types'
-import { newGame, statistics, submitRound } from './rules'
+import { endGame, newGame, newRun, nextGame, runStatistics, statistics, submitRound } from './rules'
 
 const play = (game: ReturnType<typeof newGame>, darts: Parameters<typeof submitRound>[1]) => submitRound(game, darts).game
 
@@ -37,5 +37,27 @@ describe('dart scoring', () => {
     expect(stats.checkouts).toBe(1)
     const low = play(newGame(40, 10), [numberDart(20, 2), miss(), miss()])
     expect(statistics(low).checkoutAttempts).toBe(1)
+  })
+
+  it('starts the next game with the run configuration and preserves the finished game', () => {
+    const run = newRun(301, 8)
+    const finished = endGame(run.currentGame)
+    const next = nextGame({ ...run, currentGame: finished })
+    expect(next.currentGame.startingScore).toBe(301)
+    expect(next.currentGame.roundLimit).toBe(8)
+    expect(next.currentGame.status).toBe('active')
+    expect(next.completedGames).toEqual([finished])
+  })
+
+  it('aggregates completed game statistics and results', () => {
+    const run = newRun(40, 10)
+    const win = play(run.currentGame, [numberDart(20, 2), miss(), miss()])
+    const loss = endGame(newGame(40, 10))
+    const stats = runStatistics({ ...run, currentGame: loss, completedGames: [win] })
+    expect(stats.wins).toBe(1)
+    expect(stats.losses).toBe(1)
+    expect(stats.winningPercentage).toBe(50)
+    expect(stats.totalDarts).toBe(3)
+    expect(stats.perRound).toHaveLength(1)
   })
 })

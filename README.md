@@ -1,6 +1,6 @@
 # trix
 
-A mobile-first darts scoring PWA for tracking a single player's game, dart by dart. It runs locally, works offline after installation, and stores the current game in the browser—no account or backend required.
+A mobile-first darts scoring PWA for tracking a run of standard games, dart by dart. It runs locally, works offline after installation, and stores the current run in the browser—no account or backend required.
 
 ## Features
 
@@ -8,10 +8,11 @@ A mobile-first darts scoring PWA for tracking a single player's game, dart by da
 - Three-dart draft with a live projected score
 - Singles, doubles, triples, bull, bullseye, and misses
 - Standard double-out checkout and bust rules
-- Scrollable round history and end-game statistics
-- Current-game persistence with IndexedDB
+- Scrollable round history and run-level end-game statistics
+- Wins, losses, and winning percentage across the run
+- Current-run persistence with IndexedDB
 - Installable, offline-capable PWA
-- One-click reset for starting a new game
+- Next game with the same configuration or a new run
 
 ## Requirements
 
@@ -49,7 +50,7 @@ Deploy the contents of `dist/` to any path on an HTTPS origin, including a GitHu
 
 Each round contains three editable dart slots, initially set to `Miss`. Submitting applies scoring sequentially. A checkout must finish on a double, including double bull. A bust restores the score from the start of the round and records zero points for that round.
 
-Starting a new game clears the saved game, round history, and statistics before returning to setup.
+Setup creates a run with a starting score and round limit. `Next game` keeps that configuration and preserves the run's aggregate statistics. During an active game, `End game` finishes it as a loss and opens the summary. `New run` clears the current run and returns to setup.
 
 ## Technology
 

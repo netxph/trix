@@ -37,6 +37,8 @@ describe('dart scoring', () => {
     expect(stats.checkouts).toBe(1)
     const low = play(newGame(40, 10), [numberDart(20, 2), miss(), miss()])
     expect(statistics(low).checkoutAttempts).toBe(1)
+    const odd = play(newGame(39, 10), [numberDart(19, 2), miss(), miss()])
+    expect(statistics(odd).checkoutAttempts).toBe(0)
   })
 
   it('starts the next game with the run configuration and preserves the finished game', () => {
@@ -59,5 +61,12 @@ describe('dart scoring', () => {
     expect(stats.winningPercentage).toBe(50)
     expect(stats.totalDarts).toBe(3)
     expect(stats.perRound).toHaveLength(1)
+  })
+
+  it('excludes dart sets scoring 40 or less from the average', () => {
+    const run = newRun(100, 10)
+    const low = play(newGame(100, 10), [numberDart(20, 2), miss(), miss()])
+    const high = play(newGame(100, 10), [numberDart(20, 3), miss(), miss()])
+    expect(runStatistics({ ...run, completedGames: [low, high] }).average).toBe(60)
   })
 })

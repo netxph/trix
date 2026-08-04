@@ -38,7 +38,8 @@ export function statistics(game: Game) {
     const round = game.rounds.find((candidate) => candidate.darts.includes(dart))
     if (!round || dart.kind === 'miss') return false
     const dartIndex = round.darts.indexOf(dart)
-    return round.remainingBefore - round.darts.slice(0, dartIndex).reduce((sum, item) => sum + item.score, 0) <= 40
+    const runningScore = round.remainingBefore - round.darts.slice(0, dartIndex).reduce((sum, item) => sum + item.score, 0)
+    return runningScore <= 40 && runningScore % 2 === 0
   })
   const successes = game.rounds.filter((round) => round.checkout).length
   return {
@@ -64,13 +65,14 @@ export function runStatistics(run: Run) {
   const games = [...run.completedGames, ...(run.currentGame.status === 'active' ? [] : [run.currentGame])]
   const perGame = games.map(statistics)
   const rounds = perGame.flatMap((item) => item.perRound)
+  const averageRounds = rounds.filter((score) => score > 40)
   const totalDarts = perGame.reduce((sum, item) => sum + item.totalDarts, 0)
   const checkoutAttempts = perGame.reduce((sum, item) => sum + item.checkoutAttempts, 0)
   const wins = perGame.reduce((sum, item) => sum + item.wins, 0)
   const losses = perGame.reduce((sum, item) => sum + item.losses, 0)
   return {
     totalDarts,
-    average: rounds.length ? rounds.reduce((sum, score) => sum + score, 0) / rounds.length : 0,
+    average: averageRounds.length ? averageRounds.reduce((sum, score) => sum + score, 0) / averageRounds.length : 0,
     perRound: rounds,
     bestRound: Math.max(0, ...rounds),
     singles: perGame.reduce((sum, item) => sum + item.singles, 0),

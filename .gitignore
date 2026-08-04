@@ -32,6 +32,7 @@ bun-debug.log*
 .tabnine/
 .windsurf/
 graphify-out/
+.codebase-memory/
 
 # Editors / OS
 .vscode/*

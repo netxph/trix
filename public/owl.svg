@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Friendly practice owl</title>
+  <desc id="desc">A friendly blue owl ready to practice</desc>
+  <path fill="#172554" d="M80 16c-35 0-62 25-62 62v38c0 15 12 28 28 28h68c16 0 28-13 28-28V78c0-37-27-62-62-62Z"/>
+  <path fill="#38bdf8" d="M18 72c10-10 22-14 35-14-6-12-7-23-4-34 15 5 25 13 31 25 6-12 16-20 31-25 3 11 2 22-4 34 13 0 25 4 35 14l-12 15H30L18 72Z"/>
+  <circle cx="57" cy="82" r="25" fill="#e0f2fe"/>
+  <circle cx="103" cy="82" r="25" fill="#e0f2fe"/>
+  <circle cx="57" cy="82" r="11" fill="#172554"/>
+  <circle cx="103" cy="82" r="11" fill="#172554"/>
+  <circle cx="53" cy="78" r="3" fill="#fff"/>
+  <circle cx="99" cy="78" r="3" fill="#fff"/>
+  <path fill="#fbbf24" d="m80 85 10 13-10 12-10-12 10-13Z"/>
+  <path fill="#fbbf24" d="M48 137 64 119h32l16 18H96l-16-10-16 10H48Z"/>
+</svg>
